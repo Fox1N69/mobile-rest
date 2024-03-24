@@ -19,4 +19,11 @@ func (r *Router) InitRouter(app *fiber.App) {
 	{
 		api.Get("/getAllData", r.handler.GetAllData)
 	}
+
+	auth := app.Group("/auth")
+	{
+		auth.Post("/login", r.handler.Login)
+		auth.Post("/register", r.handler.Register)
+		auth.Post("/logout", r.handler.Logout)
+	}
 }
