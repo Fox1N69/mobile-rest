@@ -26,4 +26,5 @@ func (r *Router) InitRouter(app *fiber.App) {
 		auth.Post("/register", r.handler.Register)
 		auth.Post("/logout", r.handler.Logout)
 	}
+
 }
