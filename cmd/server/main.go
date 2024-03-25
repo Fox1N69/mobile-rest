@@ -2,6 +2,7 @@ package main
 
 import (
 	"mobile/internal/app/handler"
+	"mobile/internal/pkg/database"
 	"mobile/internal/pkg/routers"
 
 	"github.com/gofiber/fiber/v3"
@@ -12,7 +13,9 @@ func main() {
 		ServerHeader: "Mobile-REST",
 	})
 
-	handler := handler.NewHandler()
+	db := database.InitDB()
+
+	handler := handler.NewHandler(db)
 
 	router := routers.NewRouter(*handler)
 	router.InitRouter(app)
