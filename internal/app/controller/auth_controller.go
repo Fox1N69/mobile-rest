@@ -32,7 +32,8 @@ func hashPassword(password []byte) ([]byte, error) {
 }
 
 func checkPassword(hashedPassword, password []byte) bool {
-	return false
+	err := bcrypt.CompareHashAndPassword(hashedPassword, password)
+	return err == nil
 }
 
 func (ac *AuthController) Login(c fiber.Ctx) error {
