@@ -53,6 +53,7 @@ func (ac *AuthController) Register(c fiber.Ctx) error {
 	}
 	user.Password = []byte(hashedPassword)
 
+	//create user
 	if result := ac.DB.Create(&user); result.Error != nil {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"message": "Error when creating user"})
 	}
