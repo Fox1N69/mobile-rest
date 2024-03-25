@@ -31,6 +31,11 @@ func hashPassword(password []byte) ([]byte, error) {
 }
 
 func (ac *AuthController) Login(c fiber.Ctx) error {
+	var user models.AuthUser
+
+	if err := json.Unmarshal(c.Body(), &user); err != nil {
+		return err
+	}
 	return nil
 }
 
