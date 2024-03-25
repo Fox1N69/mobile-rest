@@ -4,6 +4,7 @@ import (
 	"mobile/internal/app/models"
 
 	"github.com/gofiber/fiber/v3"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -23,8 +24,9 @@ func NewAuthController(db *gorm.DB) *AuthController {
 	return &AuthController{DB: db}
 }
 
-func hasPassword(user *models.AuthUser) []byte {
-	return nil
+func hashPassword(user *models.AuthUser) (string, error) {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	return string(hashed), err
 }
 
 func (ac *AuthController) Login(c fiber.Ctx) error {
