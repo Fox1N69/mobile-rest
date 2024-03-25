@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"mobile/internal/app/models"
+
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
 )
@@ -19,6 +21,10 @@ type AuthController struct {
 
 func NewAuthController(db *gorm.DB) *AuthController {
 	return &AuthController{DB: db}
+}
+
+func hasPassword(user *models.AuthUser) []byte {
+	return nil
 }
 
 func (ac *AuthController) Login(c fiber.Ctx) error {
