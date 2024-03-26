@@ -12,11 +12,11 @@ import (
 )
 
 type AuthControllerI interface {
-	Login(c fiber.Ctx) error
-	Register(c fiber.Ctx) error
-	Logout(c fiber.Ctx) error
-	RefreshToken(c fiber.Ctx) error
-	Restricted(c fiber.Ctx) error
+	Login(c *fiber.Ctx) error
+	Register(c *fiber.Ctx) error
+	Logout(c *fiber.Ctx) error
+	RefreshToken(c *fiber.Ctx) error
+	Restricted(c *fiber.Ctx) error
 }
 
 type AuthController struct {
@@ -27,35 +27,43 @@ func NewAuthController(db *gorm.DB) *AuthController {
 	return &AuthController{DB: db}
 }
 
-var secretKey = "secret"
+var secretKey = []byte("secret")
 
 func generateJWTToken(user *models.User) (string, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id":  user.ID,
+		"username": user.Username,
+		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+	})
 
-	claims := token.Claims.(jwt.MapClaims)
-	claims["user_id"] = user.ID
-	claims["username"] = user.Username
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+	tokenString, err := token.SignedString(secretKey)
+	if err != nil {
+		return "", err
+	}
 
-	return token.SignedString([]byte(secretKey))
+	return tokenString, nil
 }
 
 func verifyToken(tokenString string) (*jwt.Token, error) {
-	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, jwt.ErrSignatureInvalid
 		}
-		return []byte(secretKey), nil
+		return secretKey, nil
 	})
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
 }
 
 func hashPassword(password []byte) ([]byte, error) {
-	hashed, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-	return hashed, err
+	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
+	return hashedPassword, err
 }
 
 func checkPassword(hashedPassword, password []byte) bool {
-	err := bcrypt.CompareHashAndPassword(hashedPassword, password)
+	err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
 	return err == nil
 }
 
@@ -68,13 +76,13 @@ func (ac *AuthController) Login(c fiber.Ctx) error {
 
 	//user search by username
 	var user models.User
-	result := ac.DB.Where("username = ?", &user).First(&user)
+	result := ac.DB.Where("username = ?", loginData.Username).First(&user)
 	if result.Error != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "User not found"})
 	}
 
 	if !checkPassword(user.Password, loginData.Password) {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "Uncorecct password"})
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "Incorrect password"})
 	}
 
 	token, err := generateJWTToken(&user)
@@ -86,10 +94,11 @@ func (ac *AuthController) Login(c fiber.Ctx) error {
 		Name:     "jwt",
 		Value:    token,
 		HTTPOnly: true,
+		Expires:  time.Now().Add(time.Hour * 24),
 	}
 	c.Cookie(&cookie)
 
-	return c.JSON(fiber.Map{"token": token, "message": "Autorization was successful", "user": user})
+	return c.JSON(fiber.Map{"token": token, "message": "Authorization was successful", "user": user})
 }
 
 func (ac *AuthController) Register(c fiber.Ctx) error {
@@ -98,10 +107,11 @@ func (ac *AuthController) Register(c fiber.Ctx) error {
 		return err
 	}
 
-	// check for a username
+	// Check for an existing username
 	var existingUser models.User
-	if result := ac.DB.Where("username = ?", user.Username).First(&existingUser); result.Error != nil {
-		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"message": "A user with such an username alredy existing"})
+	result := ac.DB.Where("username = ?", user.Username).First(&existingUser)
+	if result.Error == nil {
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"message": "A user with this username already exists"})
 	}
 
 	//hashed password
@@ -112,7 +122,8 @@ func (ac *AuthController) Register(c fiber.Ctx) error {
 	user.Password = []byte(hashedPassword)
 
 	//create user
-	if result := ac.DB.Create(&user); result.Error != nil {
+	result = ac.DB.Create(&user)
+	if result.Error != nil {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"message": "Error when creating user"})
 	}
 
@@ -122,9 +133,17 @@ func (ac *AuthController) Register(c fiber.Ctx) error {
 		return err
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User successfully create", "token": token})
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User successfully created", "token": token})
 }
 
 func (ac *AuthController) Logout(c fiber.Ctx) error {
-	return nil
+	cookie := fiber.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		HTTPOnly: true,
+	}
+	c.Cookie(&cookie)
+
+	return c.JSON(fiber.Map{"message": "Logged out successfully"})
 }
