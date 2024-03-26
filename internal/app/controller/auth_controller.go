@@ -27,23 +27,28 @@ func NewAuthController(db *gorm.DB) *AuthController {
 	return &AuthController{DB: db}
 }
 
-func generateJWTToken(userID uint) (string, error) {
+var secretKey = "secret"
+
+func generateJWTToken(user *models.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
-	// install claim the token
-	claim := token.Claims.(jwt.MapClaims)
-	claim["userID"] = userID
-	claim["exp"] = time.Now().Add(time.Hour * 24).Unix()
+	claims := token.Claims.(jwt.MapClaims)
+	claims["user_id"] = user.ID
+	claims["username"] = user.Username
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
-	tokenString, err := token.SignedString([]byte("secret key"))
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
+	return token.SignedString([]byte(secretKey))
 }
 
-// password hashing function
+func verifyToken(tokenString string) (*jwt.Token, error) {
+	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return []byte(secretKey), nil
+	})
+}
+
 func hashPassword(password []byte) ([]byte, error) {
 	hashed, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
 	return hashed, err
@@ -72,10 +77,17 @@ func (ac *AuthController) Login(c fiber.Ctx) error {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "Uncorecct password"})
 	}
 
-	token, err := generateJWTToken(user.ID)
+	token, err := generateJWTToken(&user)
 	if err != nil {
 		return err
 	}
+
+	cookie := fiber.Cookie{
+		Name:     "jwt",
+		Value:    token,
+		HTTPOnly: true,
+	}
+	c.Cookie(&cookie)
 
 	return c.JSON(fiber.Map{"token": token, "message": "Autorization was successful", "user": user})
 }
