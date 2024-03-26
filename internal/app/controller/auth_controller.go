@@ -27,7 +27,7 @@ func NewAuthController(db *gorm.DB) *AuthController {
 	return &AuthController{DB: db}
 }
 
-func GenerateJWTToken(userID uint) (string, error) {
+func generateJWTToken(userID uint) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	// install claim the token
@@ -72,7 +72,12 @@ func (ac *AuthController) Login(c fiber.Ctx) error {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "Uncorecct password"})
 	}
 
-	return c.JSON(fiber.Map{"message": "Autorization was successful", "user": user})
+	token, err := generateJWTToken(user.ID)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(fiber.Map{"token": token, "message": "Autorization was successful", "user": user})
 }
 
 func (ac *AuthController) Register(c fiber.Ctx) error {
@@ -98,7 +103,14 @@ func (ac *AuthController) Register(c fiber.Ctx) error {
 	if result := ac.DB.Create(&user); result.Error != nil {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"message": "Error when creating user"})
 	}
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User successfully create"})
+
+	//generate token
+	token, err := generateJWTToken(user.ID)
+	if err != nil {
+		return err
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "User successfully create", "token": token})
 }
 
 func (ac *AuthController) Logout(c fiber.Ctx) error {
