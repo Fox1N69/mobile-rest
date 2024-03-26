@@ -2,6 +2,7 @@ package database
 
 import (
 	"log"
+	"mobile/internal/app/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -15,6 +16,8 @@ func InitDB() *gorm.DB {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	DB.AutoMigrate(&models.User{})
 
 	return DB
 }
