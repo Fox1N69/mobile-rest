@@ -117,7 +117,7 @@ func (ac *AuthController) Register(c fiber.Ctx) error {
 	}
 
 	//generate token
-	token, err := generateJWTToken(user.ID)
+	token, err := generateJWTToken(user)
 	if err != nil {
 		return err
 	}
