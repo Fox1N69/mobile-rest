@@ -3,7 +3,9 @@ module mobile
 go 1.22.0
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gofiber/fiber/v3 v3.0.0-20240322111812-5e8df0a348be
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	golang.org/x/crypto v0.19.0
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.8
