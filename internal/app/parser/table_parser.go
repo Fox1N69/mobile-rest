@@ -1,9 +1,12 @@
 package parser
 
-type ParserI interface {
-	GetData() error
+type TableParser struct {
 }
 
-func (p *Parser) GetData() error {
-	return nil
+type TableParserI interface {
 }
+
+func NewTableParser() *TableParser {
+	return &TableParser{}
+}
+
