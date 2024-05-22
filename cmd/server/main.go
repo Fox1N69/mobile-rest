@@ -6,6 +6,7 @@ import (
 	"mobile/internal/pkg/routers"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 )
@@ -14,6 +15,8 @@ func main() {
 	app := fiber.New(fiber.Config{
 		ServerHeader: "Mobile-REST",
 	})
+
+	app.Use(cors.New())
 
 	db := database.GetDB()
 
