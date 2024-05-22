@@ -18,6 +18,12 @@ func (r *Router) InitRouter(app *fiber.App) {
 	api := app.Group("/api")
 	{
 		api.Get("/getAllData", r.handler.GetAllData)
+	
+		news := api.Group("/news")
+		{
+			news.Get("/", r.handler.GetAllNews)
+			news.Get("/pars", r.handler.ParseNews)
+		}
 	}
 
 	auth := app.Group("/auth")
@@ -26,5 +32,4 @@ func (r *Router) InitRouter(app *fiber.App) {
 		auth.Post("/register", r.handler.Register)
 		auth.Post("/logout", r.handler.Logout)
 	}
-
 }

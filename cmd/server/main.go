@@ -13,7 +13,7 @@ func main() {
 		ServerHeader: "Mobile-REST",
 	})
 
-	db := database.InitDB()
+	db := database.GetDB()
 
 	handler := handler.NewHandler(db)
 
