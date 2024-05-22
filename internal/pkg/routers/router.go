@@ -7,10 +7,10 @@ import (
 )
 
 type Router struct {
-	handler handler.Handler
+	handler *handler.Handler
 }
 
-func NewRouter(h handler.Handler) *Router {
+func NewRouter(h *handler.Handler) *Router {
 	return &Router{handler: h}
 }
 
@@ -18,12 +18,10 @@ func (r *Router) InitRouter(app *fiber.App) {
 	api := app.Group("/api")
 	{
 		api.Get("/getAllData", r.handler.GetAllData)
-	
+
 		news := api.Group("/news")
 		{
 			news.Get("/", r.handler.GetAllNews)
-			news.Get("/pars", r.handler.ParseNews)
-			news.Get("/pars/full", r.handler.ParseFullNews)
 			news.Get("/:id/full", r.handler.GetFullNews)
 		}
 	}

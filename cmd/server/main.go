@@ -6,6 +6,8 @@ import (
 	"mobile/internal/pkg/routers"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/robfig/cron/v3"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -15,10 +17,30 @@ func main() {
 
 	db := database.GetDB()
 
-	handler := handler.NewHandler(db)
+	handlerInstance := handler.NewHandler(db) // Изменено имя переменной
 
-	router := routers.NewRouter(*handler)
+	c := cron.New()
+	c.AddFunc("* * * * *", func() {
+		_, err := handler.ParseNews()
+		if err != nil {
+			logrus.Infoln("Error pars news cron: ", err)
+		}
+		logrus.Info("ParserNews seccus")
+	})
+	c.AddFunc("*/2 * * * *", func() {
+		err := handler.ParseFullNews()
+		if err != nil {
+			logrus.Infoln("Error pars full news cron: ", err)
+		}
+		logrus.Info("ParserFullNews seccus")
+
+	})
+	c.Start()
+
+	router := routers.NewRouter(handlerInstance) // Удалено разыменование
 	router.InitRouter(app)
 
 	app.Listen(":8000")
+
+	select {}
 }

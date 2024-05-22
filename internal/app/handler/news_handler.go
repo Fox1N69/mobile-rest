@@ -9,18 +9,23 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-func (h *Handler) ParseNews(c fiber.Ctx) error {
+func ParseNews() ([]models.NewsData, error) {
 	doc, err := goquery.NewDocument("https://kcpt72.ru/category/%D0%BD%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D1%8C/")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var news []models.NewsData
-
 	doc.Find(".new").Each(func(i int, s *goquery.Selection) {
 		title := s.Find(".card-title").Text()
 		content := s.Find(".entry").Text()
 		link, _ := s.Find("a.more-link").Attr("href")
+
+		var count int64
+		database.DB.Model(&models.NewsData{}).Where("link = ?", link).Count(&count)
+		if count > 0 {
+			return
+		}
 
 		newsItem := models.NewsData{
 			Title:   title,
@@ -29,56 +34,32 @@ func (h *Handler) ParseNews(c fiber.Ctx) error {
 		}
 		news = append(news, newsItem)
 
-		result := database.DB.Create(&newsItem)
-		if result.Error != nil {
-			c.JSON("error")
-		}
-
-		// After saving NewsData, save FullNewsData
-		fullNewsItem := models.FullNewsData{
-			NewsDataID: newsItem.ID, // ID from the just saved NewsData
-		}
-
-		result = database.DB.Create(&fullNewsItem)
-		if result.Error != nil {
-			c.JSON("error")
-		}
+		database.DB.Create(&newsItem)
 	})
 
-	return c.JSON(news)
+	return news, nil
 }
 
-func (h *Handler) ParseFullNews(c fiber.Ctx) error {
+func ParseFullNews() (error) {
 	var newsLinks []models.NewsData
-	// Fetch all news data including links and IDs
-	if err := database.DB.Find(&newsLinks).Error; err != nil {
-		return err
-	}
+	database.DB.Find(&newsLinks)
 
 	for _, newsData := range newsLinks {
 		doc, err := goquery.NewDocument(newsData.Link)
 		if err != nil {
-			continue // Handle error appropriately
+			continue
 		}
 
-		// Parsing data from the page
-		fullContent := doc.Find(".entry").Text() // Use the correct selector for your case
-
+		fullContent := doc.Find(".entry").Text()
 		fullNewsItem := models.FullNewsData{
-			NewsDataID: newsData.ID, // Set the NewsDataID
-			Title: newsData.Title,
+			NewsDataID: newsData.ID,
+			Title:      newsData.Title,
 			Content:    fullContent,
 			Link:       newsData.Link,
 		}
-
-		// Update the full news item in the database
-		result := database.DB.Model(&models.FullNewsData{}).Where("news_data_id = ?", newsData.ID).Updates(fullNewsItem)
-		if result.Error != nil {
-			continue // Handle error appropriately
-		}
+		database.DB.Model(&models.FullNewsData{}).Where("news_data_id = ?", newsData.ID).Updates(fullNewsItem)
 	}
-
-	return c.JSON(fiber.Map{"message": "success"})
+	return nil
 }
 
 func (h *Handler) GetAllNews(c fiber.Ctx) error {
