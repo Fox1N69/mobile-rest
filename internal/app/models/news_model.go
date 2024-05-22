@@ -1,14 +1,21 @@
-package models 
+package models
 
 type NewsData struct {
-	ID int64 `json:"id"`
-	Title string `json:"title"`
-	Content string `json:"content"`
+	ID uint `json:"id" gorm:"primaryKey"`
+	Title    string `json:"title"`
+	Content  string `json:"content"`
+	Link     string `json:"link"`
+	FullNews *FullNewsData `gorm:"foreignKey:NewsDataID"`
+}
+
+type FullNewsData struct {
+	ID uint `gorm:"primaryKey"`
+	NewsDataID uint   `json:"newsdata_id"`
+	Title      string `json:"title"`
+	Content    string `json:"content"`
 	Link string `json:"link"`
 }
 
-type NewsDataFull struct {
-	ID int64 `json:"id"`
-	Title string `json:"title"`
-	Content string `json:"content"`
+func (f *FullNewsData) SetTitleFromNewsData(news *NewsData) {
+	f.Title = news.Title
 }
