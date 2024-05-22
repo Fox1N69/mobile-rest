@@ -20,14 +20,14 @@ func main() {
 	handlerInstance := handler.NewHandler(db) // Изменено имя переменной
 
 	c := cron.New()
-	c.AddFunc("* * * * *", func() {
+	c.AddFunc("0 0 * * *", func() {
 		_, err := handler.ParseNews()
 		if err != nil {
 			logrus.Infoln("Error pars news cron: ", err)
 		}
 		logrus.Info("ParserNews seccus")
 	})
-	c.AddFunc("*/2 * * * *", func() {
+	c.AddFunc("1 0 * * *", func() {
 		err := handler.ParseFullNews()
 		if err != nil {
 			logrus.Infoln("Error pars full news cron: ", err)

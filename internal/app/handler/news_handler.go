@@ -40,7 +40,7 @@ func ParseNews() ([]models.NewsData, error) {
 	return news, nil
 }
 
-func ParseFullNews() (error) {
+func ParseFullNews() error {
 	var newsLinks []models.NewsData
 	database.DB.Find(&newsLinks)
 
@@ -57,7 +57,7 @@ func ParseFullNews() (error) {
 			Content:    fullContent,
 			Link:       newsData.Link,
 		}
-		database.DB.Model(&models.FullNewsData{}).Where("news_data_id = ?", newsData.ID).Updates(fullNewsItem)
+		database.DB.Where(models.FullNewsData{NewsDataID: newsData.ID}).FirstOrCreate(&fullNewsItem)
 	}
 	return nil
 }
@@ -85,4 +85,21 @@ func (h *Handler) GetFullNews(c fiber.Ctx) error {
 	}
 
 	return c.JSON(fullNews)
+}
+
+func (h *Handler) TriggerParseFullNews(c fiber.Ctx) error {
+	err := ParseFullNews()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to parse full news"})
+	}
+	return c.SendStatus(fiber.StatusOK)
+}
+
+func (h *Handler) TriggerParseNews(c fiber.Ctx) error {
+	_, err := ParseNews()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to parse full news"})
+	}
+
+	return c.SendStatus(fiber.StatusOK)
 }

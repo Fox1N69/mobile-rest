@@ -23,6 +23,8 @@ func (r *Router) InitRouter(app *fiber.App) {
 		{
 			news.Get("/", r.handler.GetAllNews)
 			news.Get("/:id/full", r.handler.GetFullNews)
+			news.Get("/test/pars", r.handler.TriggerParseNews)
+			news.Get("/test/fullpars", r.handler.TriggerParseFullNews)
 		}
 	}
 
