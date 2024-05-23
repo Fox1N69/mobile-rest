@@ -2,8 +2,6 @@ package service
 
 import (
 	"mobile/internal/app/repository"
-
-	"github.com/gofiber/fiber/v3"
 )
 
 type ApiService struct {
@@ -12,8 +10,4 @@ type ApiService struct {
 
 func NewApiService(apiRepository repository.ApiRepository) *ApiService {
 	return &ApiService{repository: apiRepository}
-}
-
-func (s *ApiService) GetAllData(c fiber.Ctx) error {
-	return nil
 }

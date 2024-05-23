@@ -17,7 +17,8 @@ func NewRouter(h *handler.Handler) *Router {
 func (r *Router) InitRouter(app *fiber.App) {
 	api := app.Group("/api")
 	{
-		api.Get("/getAllData", r.handler.GetAllData)
+		api.Post("/emailTraning", r.handler.SendTraningForm)
+		api.Post("/emailArmy", r.handler.SendArmyForm)
 
 		news := api.Group("/news")
 		{
