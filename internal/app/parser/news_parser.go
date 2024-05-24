@@ -57,10 +57,11 @@ func ParseFullNews() error {
 		fullContent := doc.Find(".entry").Text()
 
 		fullNewsItem := models.FullNewsData{
-			NewsDataID: newsData.ID,
-			Title:      newsData.Title,
-			Content:    fullContent,
-			Link:       newsData.Link,
+			NewsDataID:   newsData.ID,
+			Title:        newsData.Title,
+			Content:      fullContent,
+			NewsImageUrl: newsData.ImageUrl,
+			Link:         newsData.Link,
 		}
 		if err := database.DB.Where(models.FullNewsData{NewsDataID: newsData.ID}).FirstOrCreate(&fullNewsItem).Error; err != nil {
 			log.Printf("Error saving news item: %v", err)

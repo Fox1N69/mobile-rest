@@ -19,12 +19,14 @@ type FormArmy struct {
 }
 
 type ScholarshipForm struct {
-	Fio           string `json:"fio"`
-	Specialty     string `json:"specialty"`
-	Group         string `json:"group"`
-	PaymentPeriod string `json:"payment_period"`
-	Quantity      string `json:"quantity"`
-	Email         string `json:"email"`
-	PhoneNumber   string `json:"phone_number"`
-	Message       string `json:"message"`
+	Fio            string `json:"fio"`
+	Specialty      string `json:"specialty"`
+	Group          string `json:"group"`
+	PaymentPeriod  string `json:"payment_period"`
+	Quantity       string `json:"quantity"`
+	SendByEmail    bool
+	PickupInOffice bool
+	Email          string `json:"email"`
+	PhoneNumber    string `json:"phone_number"`
+	Message        string `json:"message"`
 }

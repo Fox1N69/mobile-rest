@@ -10,11 +10,12 @@ type NewsData struct {
 }
 
 type FullNewsData struct {
-	ID         uint   `gorm:"primaryKey"`
-	NewsDataID uint   `json:"newsdata_id"`
-	Title      string `json:"title"`
-	Content    string `json:"content"`
-	Link       string `json:"link"`
+	ID           uint   `gorm:"primaryKey"`
+	NewsDataID   uint   `json:"newsdata_id"`
+	Title        string `json:"title"`
+	Content      string `json:"content"`
+	NewsImageUrl string `json:"newsimage_url"`
+	Link         string `json:"link"`
 }
 
 func (f *FullNewsData) SetTitleFromNewsData(news *NewsData) {
