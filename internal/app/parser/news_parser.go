@@ -18,6 +18,11 @@ func ParseNews() ([]models.NewsData, error) {
 		title := s.Find(".card-title").Text()
 		content := s.Find(".entry").Text()
 		link, _ := s.Find("a.more-link").Attr("href")
+		imageUrl, exists := s.Find("img").Attr("src")
+
+		if !exists {
+			imageUrl = ""
+		}
 
 		var count int64
 		database.DB.Model(&models.NewsData{}).Where("link = ?", link).Count(&count)
@@ -29,6 +34,7 @@ func ParseNews() ([]models.NewsData, error) {
 			Title:   title,
 			Content: content,
 			Link:    link,
+			ImageUrl: imageUrl,
 		}
 		news = append(news, newsItem)
 

@@ -5,6 +5,7 @@ type NewsData struct {
 	Title    string `json:"title"`
 	Content  string `json:"content"`
 	Link     string `json:"link"`
+	ImageUrl string `json:"image_url"`
 	FullNews *FullNewsData `gorm:"foreignKey:NewsDataID"`
 }
 
