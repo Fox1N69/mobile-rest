@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"log"
 	"mobile/internal/app/models"
 	"mobile/internal/pkg/database"
 
@@ -31,9 +32,9 @@ func ParseNews() ([]models.NewsData, error) {
 		}
 
 		newsItem := models.NewsData{
-			Title:   title,
-			Content: content,
-			Link:    link,
+			Title:    title,
+			Content:  content,
+			Link:     link,
 			ImageUrl: imageUrl,
 		}
 		news = append(news, newsItem)
@@ -53,15 +54,17 @@ func ParseFullNews() error {
 		if err != nil {
 			continue
 		}
-
 		fullContent := doc.Find(".entry").Text()
+
 		fullNewsItem := models.FullNewsData{
 			NewsDataID: newsData.ID,
 			Title:      newsData.Title,
 			Content:    fullContent,
 			Link:       newsData.Link,
 		}
-		database.DB.Where(models.FullNewsData{NewsDataID: newsData.ID}).FirstOrCreate(&fullNewsItem)
+		if err := database.DB.Where(models.FullNewsData{NewsDataID: newsData.ID}).FirstOrCreate(&fullNewsItem).Error; err != nil {
+			log.Printf("Error saving news item: %v", err)
+		}
 	}
 	return nil
 }
