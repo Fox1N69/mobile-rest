@@ -19,6 +19,7 @@ func (r *Router) InitRouter(app *fiber.App) {
 	{
 		api.Post("/emailTraning", r.handler.SendTraningForm)
 		api.Post("/emailArmy", r.handler.SendArmyForm)
+		api.Post("/emailPayment", r.handler.SendScholarshipForm)
 
 		news := api.Group("/news")
 		{

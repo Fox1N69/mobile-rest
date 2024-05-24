@@ -4,7 +4,7 @@ type FormDataAboutTraning struct {
 	FirstName  string `json:"first_name"`
 	LastName   string `json:"last_name"`
 	Patronymic string `json:"patronymic"`
-	Direction  string `json:"direction"`
+	Specialty  string `json:"specialty"`
 	Group      string `json:"group"`
 	Quantity   string `json:"quantity"`
 	Message    string `json:"message"`
@@ -12,16 +12,14 @@ type FormDataAboutTraning struct {
 
 type FormArmy struct {
 	Fio       string `json:"fio"`
-	Direction string `json:"direction"`
+	Specialty string `json:"specialty"`
 	Group     string `json:"group"`
 	ArmyName  string `json:"army_name"`
 	Message   string `json:"message"`
 }
 
 type ScholarshipForm struct {
-	FirstName     string `json:"first_name"`
-	Patronymic    string `json:"patronymic"`
-	LastName      string `json:"last_name"`
+	Fio           string `json:"fio"`
 	Specialty     string `json:"specialty"`
 	Group         string `json:"group"`
 	PaymentPeriod string `json:"payment_period"`

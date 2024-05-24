@@ -76,12 +76,12 @@ func (h *Handler) GetFullNews(c fiber.Ctx) error {
 	newsIDStr := c.Params("id")
 	newsID, err := strconv.Atoi(newsIDStr)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid ID"})
+		return c.Status(400).JSON(fiber.Map{"error": "invalid ID"})
 	}
 
 	var fullNews models.FullNewsData
 	if err := database.DB.Where("news_data_id = ?", newsID).First(&fullNews).Error; err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "news not found"})
+		return c.Status(400).JSON(fiber.Map{"error": "news not found"})
 	}
 
 	return c.JSON(fullNews)
@@ -90,16 +90,16 @@ func (h *Handler) GetFullNews(c fiber.Ctx) error {
 func (h *Handler) TriggerParseFullNews(c fiber.Ctx) error {
 	err := ParseFullNews()
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to parse full news"})
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to parse full news"})
 	}
-	return c.SendStatus(fiber.StatusOK)
+	return c.SendStatus(200)
 }
 
 func (h *Handler) TriggerParseNews(c fiber.Ctx) error {
 	_, err := ParseNews()
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to parse full news"})
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to parse full news"})
 	}
 
-	return c.SendStatus(fiber.StatusOK)
+	return c.SendStatus(200)
 }
