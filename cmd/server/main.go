@@ -2,6 +2,7 @@ package main
 
 import (
 	"mobile/internal/app/handler"
+	"mobile/internal/app/parser"
 	"mobile/internal/pkg/database"
 	"mobile/internal/pkg/routers"
 
@@ -28,14 +29,14 @@ func main() {
 
 	c := cron.New()
 	c.AddFunc("0 0 * * *", func() {
-		_, err := handler.ParseNews()
+		_, err := parser.ParseNews()
 		if err != nil {
 			logrus.Infoln("Error pars news cron: ", err)
 		}
 		logrus.Info("ParserNews seccus")
 	})
 	c.AddFunc("1 0 * * *", func() {
-		err := handler.ParseFullNews()
+		err := parser.ParseFullNews()
 		if err != nil {
 			logrus.Infoln("Error pars full news cron: ", err)
 		}
