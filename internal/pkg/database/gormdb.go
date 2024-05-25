@@ -12,7 +12,7 @@ import (
 var DB *gorm.DB
 
 func InitGormDB() *gorm.DB {
-	dsn := "host=localhost user=postgres password=8008 dbname=kcpt-news port=5432 sslmode=disable"
+	dsn := "postgresql://kcptmobile_owner:DJna7BeoVqL8@ep-nameless-snowflake-a2w545g1.eu-central-1.aws.neon.tech/kcptmobile?sslmode=require"
 	DB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		logrus.Fatal("Connect database ", err)

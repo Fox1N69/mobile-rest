@@ -60,22 +60,18 @@ func (h *Handler) SendScholarshipForm(c fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Request parsing failed"})
 	}
 
-	// Формируем базовое сообщение
 	emailBody := fmt.Sprintf(" ФИО Студента:    %s\n Направление:    %s\n Группа:    %s\n Период выплат:     %s\n Количество:    %s",
 		data.Fio, data.Specialty, data.Group, data.PaymentPeriod, data.Quantity)
 
-	// Дополняем сообщение в зависимости от выбранного метода получения справки
 	if data.SendByEmail {
 		emailBody += "\n\n Способ получения:    Отправить на почту \n"
 	} else if data.PickupInOffice {
 		emailBody += "\n\n Способ получения:    Студент заберет справку самостоятельно\n"
 	}
 
-	// Добавляем остальные данные в письмо
 	emailBody += fmt.Sprintf("\n\n Почта куда отправить спраку:    %s\n Номер телефона:   %s\n Сообщение:   %s",
 		data.Email, data.PhoneNumber, data.Message)
 
-	// Отправляем письмо
 	if err := emailService.SendMail("maksimow-pasha1707@mail.ru", "Новая заявка", emailBody); err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": "Failed to send email",

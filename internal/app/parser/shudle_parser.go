@@ -52,24 +52,20 @@ func download() {
 }
 
 func twoTable(pathfile1, pathfile2 string) error {
-	// Load the first workbook
 	workbook1, err := excelize.OpenFile(pathfile1)
 	if err != nil {
 		return err
 	}
 
-	// Load the second workbook
 	workbook2, err := excelize.OpenFile(pathfile2)
 	if err != nil {
 		return err
 	}
 
-	// Create a new workbook
 	mergedWorkbook := excelize.NewFile()
 	mergedWorkbook.NewSheet("Sheet1")
 	currentRow := 1
 
-	// Merge data from the first workbook
 	for _, sheetName := range workbook1.GetSheetMap() {
 		rows := workbook1.GetRows(sheetName)
 		for _, row := range rows {
@@ -79,7 +75,6 @@ func twoTable(pathfile1, pathfile2 string) error {
 		}
 	}
 
-	// Merge data from the second workbook
 	for _, sheetName := range workbook2.GetSheetMap() {
 		rows := workbook2.GetRows(sheetName)
 		for _, row := range rows {
@@ -89,7 +84,6 @@ func twoTable(pathfile1, pathfile2 string) error {
 		}
 	}
 
-	// Save the merged workbook to a new file
 	if err := mergedWorkbook.SaveAs("Excel/2table.xlsx"); err != nil {
 		return err
 	}
