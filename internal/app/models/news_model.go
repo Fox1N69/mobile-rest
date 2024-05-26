@@ -6,7 +6,7 @@ type NewsData struct {
 	Content  string        `json:"content"`
 	Link     string        `json:"link"`
 	ImageUrl string        `json:"image_url"`
-	FullNews *FullNewsData `gorm:"foreignKey:NewsDataID"`
+	FullNews  FullNewsData   `json:"full_news"` 
 }
 
 type FullNewsData struct {
@@ -18,6 +18,8 @@ type FullNewsData struct {
 	Link         string `json:"link"`
 }
 
-func (f *FullNewsData) SetTitleFromNewsData(news *NewsData) {
-	f.Title = news.Title
+
+func (news *NewsData) SetFullNews(fullNews FullNewsData) {
+	news.FullNews = fullNews
+
 }

@@ -12,7 +12,8 @@ import (
 var DB *gorm.DB
 
 func InitGormDB() *gorm.DB {
-	dsn := "postgresql://kcptmobile_owner:DJna7BeoVqL8@ep-nameless-snowflake-a2w545g1.eu-central-1.aws.neon.tech/kcptmobile?sslmode=require"
+	//dsn := "postgresql://kcptmobile_owner:DJna7BeoVqL8@ep-nameless-snowflake-a2w545g1.eu-central-1.aws.neon.tech/kcptmobile?sslmode=require"
+	dsn := "host=localhost user=postgres password=8008 dbname=kcpt-news port=5432 sslmode=disable"
 	DB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		logrus.Fatal("Connect database ", err)
@@ -20,6 +21,8 @@ func InitGormDB() *gorm.DB {
 	logrus.Infoln("Database connect...")
 
 	DB.AutoMigrate(&models.NewsData{}, &models.FullNewsData{})
+	DB.AutoMigrate(&models.Prepod{}, &models.Group{}, &models.Subject{})
+	DB.AutoMigrate(&models.Change{}, &models.Urok{})
 	DB.Exec("ALTER SEQUENCE clients_id_seq RESTART WITH 1")
 
 	return DB

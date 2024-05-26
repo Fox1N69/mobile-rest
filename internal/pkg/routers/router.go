@@ -30,6 +30,11 @@ func (r *Router) InitRouter(app *fiber.App) {
 		}
 	}
 
+	admin := app.Group("/admin")
+	{
+		admin.Get("/GetChangeData", r.handler.GetChangeData)
+	}
+
 	auth := app.Group("/auth")
 	{
 		auth.Post("/login", r.handler.Login)

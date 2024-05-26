@@ -8,13 +8,17 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
+	"github.com/gofiber/template/html/v2"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
+	engine := html.New("./templates", ".html")
+
 	app := fiber.New(fiber.Config{
 		ServerHeader: "Mobile-REST",
+		Views:        engine,
 	})
 
 	app.Use(cors.New(cors.Config{
