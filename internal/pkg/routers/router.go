@@ -20,19 +20,27 @@ func (r *Router) InitRouter(app *fiber.App) {
 		api.Post("/emailTraning", r.handler.SendTraningForm)
 		api.Post("/emailArmy", r.handler.SendArmyForm)
 		api.Post("/emailPayment", r.handler.SendScholarshipForm)
+		api.Get("/about", r.handler.GetAboutInfo)
 
 		news := api.Group("/news")
 		{
 			news.Get("/", r.handler.GetAllNews)
 			news.Get("/:id/full", r.handler.GetFullNews)
-			news.Get("/test/pars", r.handler.TriggerParseNews)
-			news.Get("/test/fullpars", r.handler.TriggerParseFullNews)
+
 		}
 	}
 
 	admin := app.Group("/admin")
 	{
 		admin.Get("/GetChangeData", r.handler.GetChangeData)
+	}
+
+	test := app.Group("/test")
+	{
+		test.Get("/parsAbout", r.handler.ParserAboutO)
+		test.Get("/pars", r.handler.TriggerParseNews)
+		test.Get("/fullpars", r.handler.TriggerParseFullNews)
+		test.Get("/abiture", r.handler.AbiturePage)
 	}
 
 	auth := app.Group("/auth")

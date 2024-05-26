@@ -23,6 +23,7 @@ func InitGormDB() *gorm.DB {
 	DB.AutoMigrate(&models.NewsData{}, &models.FullNewsData{})
 	DB.AutoMigrate(&models.Prepod{}, &models.Group{}, &models.Subject{})
 	DB.AutoMigrate(&models.Change{}, &models.Urok{})
+	DB.AutoMigrate(&models.AboutOrganization{})
 	DB.Exec("ALTER SEQUENCE clients_id_seq RESTART WITH 1")
 
 	return DB
